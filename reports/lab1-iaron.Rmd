@@ -1,0 +1,113 @@
+---
+title: "Lab1-1 Iaron"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(here)
+theme_set(theme_bw())
+```
+
+Primeiramente, iremos descobrir de quais séries nós temos dados, para podermos escolher algumas para usarmos no Lab 1.
+
+```{r}
+episodes_total = read_csv(here("data/series_from_imdb.csv"), 
+                    progress = FALSE,
+                    col_types = cols(.default = col_double(), 
+                                     series_name = col_character(), 
+                                     episode = col_character(), 
+                                     url = col_character(),
+                                     season = col_character()))
+
+    
+series = unique(episodes_total$series_name)
+sort(series)
+
+```
+
+A partir de tal tabela, 4 séries foram escolhidas: "Brooklyn Nine-Nine", "Dexter", "Parks and Recreation" e "Scandal". Antes de começar a análise, é necessário entender como estão os dados. Para isso, foi verificado quantos votos tem cada episódio das séries.
+
+```{r}
+episodes = episodes_total %>% filter(series_name %in% c("Brooklyn Nine-Nine", "Dexter","Parks and Recreation","Scandal"))
+
+```
+
+```{r}
+episodes %>% 
+  filter(series_name == "Dexter") %>%
+  ggplot(aes(x = series_ep, y = user_votes)) + 
+  geom_line() + 
+  geom_point() +
+  ggtitle("Dexter") +
+  scale_y_continuous(breaks = round(seq(0, 15000, by = 1000),1))
+```
+```{r}
+episodes %>% 
+  filter(series_name == "Brooklyn Nine-Nine") %>%
+  ggplot(aes(x = series_ep, y = user_votes)) + 
+  geom_line() + 
+  geom_point() +
+  ggtitle("Brooklyn Nine-Nine")
+```
+```{r}
+episodes %>% 
+  filter(series_name == "Parks and Recreation") %>%
+  ggplot(aes(x = series_ep, y = user_votes)) + 
+  geom_line() + 
+  geom_point() +
+  ggtitle("Parks and Recreation") +
+  scale_y_continuous(breaks = round(seq(0, 3000, by = 200),1))
+```
+```{r}
+episodes %>% 
+  filter(series_name == "Scandal") %>%
+  ggplot(aes(x = series_ep, y = user_votes)) + 
+  geom_line() + 
+  geom_point() +
+  ggtitle("Scandal")
+               
+```
+
+A partir dos gráficos, é possível perceber que Dexter é a série com mais avaliações enquanto Scandal é a com menos. Podemos também observar que a maioria dos episódios de Dexter receberam entre 2000 e 3000 avaliações, Brooklyn começou com cerca de 1000 avaliações por episódios e foi caindo para cerca de 400, Parks and Recreation possui entre 1200 e 600 e Scandal começou com cerca de 600 e foi caindo para 200. Isso indica que Dexter e Parks and Recreation tiveram uma consistência de avaliação maior com o decorrer do tempo. Também possível observar que todas as séries possuem picos de avaliações em alguns episódios.
+
+
+Pergunta 1: Qual das séries que você escolheu é mais bem avaliada no IMDB? A diferença é grande? Pequena? Muda de acordo com as temporadas da série? 
+
+Para começar a responder tais perguntas, foi calculado a média das notas das quatro séries.
+
+CONTINUAR DAQUI
+
+```{r}
+episodes %>% 
+  group_by(series_name) %>%
+  summarise(Media_serie = mean(user_rating))
+               
+```
+
+```{r}
+episodes %>% 
+  group_by(series_name) %>%
+  summarise(Media_serie = mean(user_rating)) %>%
+  ggplot(aes(x = series_name, y = Media_serie)) + 
+  geom_bar(stat = "identity")
+               
+```
+
+```{r}
+episodes %>% 
+  group_by(series_name) %>%
+  ggplot(aes(x = series_name, y = user_rating)) + 
+  geom_boxplot() 
+               
+```
+
+
+
